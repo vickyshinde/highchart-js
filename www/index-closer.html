@@ -1,0 +1,273 @@
+<html>
+<head>
+	<meta charset="UTF-8">
+	<title>Document</title>
+	<!-- Latest compiled and minified CSS -->
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
+
+	<!-- Optional theme -->
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap-theme.min.css">
+	<style>
+		body {
+			background: #ccc;
+			padding-top: 20px;
+		}
+	</style>
+	<script src="http://code.jquery.com/jquery-1.11.3.min.js"></script>
+	<script src="http://code.jquery.com/jquery-migrate-1.2.1.min.js"></script>
+	<script src="http://code.highcharts.com/highcharts.js"></script>
+	<script src="http://code.highcharts.com/modules/exporting.js"></script>
+	<script type="text/javascript">
+			/*var path = {
+				"Nausea" : "api/nauseaCausingDrug.json",
+				"Humira" : "humiraGenderDistribution"
+			}*/
+
+			var adverseEffect = "api/adverseEffect.json";
+			var nauseaCausingDrug = "api/nauseaCausingDrug.json";
+			var humiraGenderDistribution = "api/humiraGenderDistribution.json";
+
+			var chartDiv1 = "#chart1";
+			var chartDiv2 = "#chart2";
+
+			function jsonFetch (url, divWrap) {
+				var result = null;
+				$.ajax({
+					url : url,
+					type: 'GET',
+					success :function(response){
+				        success(response, divWrap);
+				      },
+					error: function(){
+						lert("data is not found")
+					}
+				})
+			};
+
+			function success (data, divWrap){
+				var categoriesList = [];
+			    var countList = [];
+			    result = data.result;
+			    result.map(function(resultName){
+			      categoriesList.push(resultName.name);
+			      countList.push(resultName.count);            
+			    });
+			    createBarChart(categoriesList, countList, divWrap, function(point){
+			      jsonFetch(nauseaCausingDrug, chartDiv2);
+			    });
+			    console.log(result);
+			}
+
+			jsonFetch (adverseEffect, chartDiv1)
+
+			function createBarChart (categoryNames, categoryCount, divWrap, pointCl){
+				$(divWrap).highcharts({
+				    chart: {
+				        type: 'bar'
+				    },
+				    title: {
+				        text: 'My 1st Chart'
+				    },
+				    xAxis: {
+				        categories: categoryNames
+				    },
+				    plotOptions: {
+				        bar: {
+				            dataLabels: {
+				                enabled: true
+				            }
+				        },
+	                    series: {
+	                        cursor: 'pointer',
+	                        point: {
+	                            events: {
+	                                click: function () {	                                  
+	                                   pointCl(this.category);
+	                                }
+	                            }
+	                        }
+	                    }
+	                },
+				    series: [{
+				        name: 'Subjects',
+				        data: categoryCount
+				    }]
+				});
+			};
+			function createPieChart (categoryNames, categoryCount, divWrap, pointCl){
+				$(divWrap).highcharts({
+			 	    chart: {
+			 	        plotBackgroundColor: null,
+			 	        plotBorderWidth: null,
+			 	        plotShadow: false,
+			 	        type: 'pie'
+			 	    },
+			         title: {
+			             text: 'My 3rd Chart'
+			         },
+			         subtitle: {
+			             text: 'Source: <a href="https://webonise.com">webonise.com</a>'
+			         },
+			 	    plotOptions: {
+			 	        pie: {
+			 	            allowPointSelect: true,
+			 	            cursor: 'pointer',
+			 	            dataLabels: {
+			 	                enabled: false
+			 	            },
+			 	            showInLegend: true
+			 	        }
+			 	    },
+			 	    series: [{
+			 	        name: 'Subjects',
+			 	        data: processedJsonChart3
+			 	    }]
+			 	});
+			};
+
+
+
+
+		
+
+		/*var funChartTwo = function(category){
+			var jsonURLChart2 = category.toLowerCase() + 'CausingDrug';
+			$.ajax({
+				url: "api/" + jsonURLChart2 + ".json",
+				type: "GET",
+				success: function(data){
+					// Chart 1 //
+					var processedJsonChart2 = new Array();   
+					   for (i = 0; i < data.result.length; i++){
+			              processedJsonChart2.push([data.result[i].name, data.result[i].count]);
+			          }
+				    	$('#chart2').highcharts({
+					        chart: {
+					            type: 'bar'
+					        },
+					        title: {
+					            text: 'My 2nd Chart'
+					        },
+					        subtitle: {
+					            text: 'Source: <a href="https://webonise.com">webonise.com</a>'
+					        },
+					        xAxis: {
+					            categories: []
+					        },
+					        yAxis: {
+				            min: 0,
+					            title: {
+					                text: 'Population (millions)',
+					                align: 'high'
+					            },
+					            labels: {
+					                overflow: 'justify'
+					            }
+					        },
+					        tooltip: {
+					            valueSuffix: ' millions'
+					        },
+					        plotOptions: {
+						        bar: {
+						            dataLabels: {
+						                enabled: true
+						            }
+						        },
+			                   series: {
+			                       cursor: 'pointer',
+			                       point: {
+			                           events: {
+			                               click: function () {
+			                                  funChartThree(this.name);
+			                               }
+			                           }
+			                       }
+			                   }
+			               },
+					        legend: {
+					            layout: 'vertical',
+					            align: 'right',
+					            verticalAlign: 'top',
+					            x: -40,
+					            y: 80,
+					            floating: true,
+					            borderWidth: 1,
+					            backgroundColor: ((Highcharts.theme && Highcharts.theme.legendBackgroundColor) || '#FFFFFF'),
+					            shadow: true
+					        },
+					        credits: {
+					            enabled: false
+					        },
+					        series: [{
+				                name: 'Subjects',
+				                data: processedJsonChart2
+				            }]
+					    });
+					},
+				error: function(){
+					alert("data is not found")
+				}
+			});
+		};
+
+		var funChartThree = function(category){
+			var jsonURLChart3 = category.toLowerCase() + 'GenderDistribution';
+			$.ajax({
+				url: "api/" + jsonURLChart3 + ".json",
+				type: "GET",
+				success: function(data){
+					// Chart 1 //
+					var processedJsonChart3 = new Array();   
+					   for (i = 0; i < data.result.length; i++){
+			              processedJsonChart3.push([data.result[i].name, data.result[i].y]);
+			          }
+			    		$('#chart3').highcharts({
+			    		    chart: {
+			    		        plotBackgroundColor: null,
+			    		        plotBorderWidth: null,
+			    		        plotShadow: false,
+			    		        type: 'pie'
+			    		    },
+			    	        title: {
+			    	            text: 'My 3rd Chart'
+			    	        },
+			    	        subtitle: {
+			    	            text: 'Source: <a href="https://webonise.com">webonise.com</a>'
+			    	        },
+			    		    plotOptions: {
+			    		        pie: {
+			    		            allowPointSelect: true,
+			    		            cursor: 'pointer',
+			    		            dataLabels: {
+			    		                enabled: false
+			    		            },
+			    		            showInLegend: true
+			    		        }
+			    		    },
+			    		    series: [{
+			    		        name: 'Subjects',
+			    		        data: processedJsonChart3
+			    		    }]
+			    		});
+					},
+				error: function(){
+					alert("data is not found")
+				}
+			});
+		};*/
+	</script>
+	
+</head>
+<body>
+
+<div class="container-fluid">
+  <div class="row">
+    <div class="col-md-4"><div id="chart1" style="min-width: 310px; max-width: 800px; height: 600px; margin: 0 auto"></div></div>
+    <div class="col-md-4"><div id="chart2" style="min-width: 310px; max-width: 800px; height: 600px; margin: 0 auto"></div></div>
+    <div class="col-md-4"><div id="chart3" style="min-width: 310px; max-width: 800px; height: 600px; margin: 0 auto"></div></div>
+  </div>
+</div>
+
+<!-- <div id="results">	</div> -->
+</body>
+</html>

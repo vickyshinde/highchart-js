@@ -1,0 +1,221 @@
+<html>
+<head>
+	<meta charset="UTF-8">
+	<title>Document</title>
+	<!-- Latest compiled and minified CSS -->
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
+
+	<!-- Optional theme -->
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap-theme.min.css">
+	<style>
+		body {
+			background: #ccc;
+			padding-top: 20px;
+		}
+	</style>	
+</head>
+<body>
+
+<div class="container-fluid">
+  <div class="row">
+    <div class="col-md-4"><div id="chart1" style="min-width: 310px; max-width: 800px; height: 600px; margin: 0 auto"></div></div>
+    <div class="col-md-4"><div id="chart2" style="min-width: 310px; max-width: 800px; height: 600px; margin: 0 auto"></div></div>
+    <div class="col-md-4"><div id="chart3" style="min-width: 310px; max-width: 800px; height: 600px; margin: 0 auto"></div></div>
+  </div>
+</div>
+
+<script src="http://code.jquery.com/jquery-1.11.3.min.js"></script>
+<script src="http://code.jquery.com/jquery-migrate-1.2.1.min.js"></script>
+<script src="http://code.highcharts.com/highcharts.js"></script>
+<script src="http://code.highcharts.com/modules/exporting.js"></script>
+<script type="text/javascript">
+
+// self executive function for API URL's //
+(function(apiUrl) {
+    var config = {
+        adverse: "adverseEffect",
+        humira: "humiraGenderDistribution",
+        nausea: "nauseaCausingDrug"
+    }
+    return apiUrl.apiConfig = config;
+})(this);
+
+// self executive function for Fetch API //
+(function(fetchAjax) {
+    fetchAjax.fetch = function(url, success) {
+        $.ajax({
+            url: "api/" + url + ".json",
+            type: 'GET',
+            success: success,
+            error: function() {
+                alert("data is not found")
+            }
+        });
+    };
+})(this);
+
+// self executive function for SAVE API data //
+(function(global) {
+
+    var adverse = [];
+    var humira = [];
+    var nausea = [];
+    var moduleData = {
+        getAdverseValue: function() {
+            return adverse;
+        },
+        setAdverseValue: function(value) {
+            adverse = value;
+        },
+        getHumiraValue: function() {
+            return humira;
+        },
+        setHumiraValue: function(value) {
+            humira = value;
+        },
+        getNauseaValue: function() {
+            return nausea;
+        },
+        setNauseaValue: function(value) {
+            nausea = value;
+        }
+    }
+    global.module = moduleData;
+})(this);
+
+// self executive function for Create highchart //
+(function() {
+    fetch(apiConfig.adverse, function(response) {
+        module.setAdverseValue(response)
+        chartOne(module.getAdverseValue());
+    });
+
+    function chartOne(data) {
+            // Chart 1 //
+        var processedJsonChart1 = new Array();
+        for (i = 0; i < data.result.length; i++) {
+            processedJsonChart1.push([data.result[i].name, data.result[i].count]);
+        }
+        $('#chart1').highcharts({
+            chart: {
+                type: 'bar'
+            },
+            title: {
+                text: 'My 1st Chart'
+            },
+            subtitle: {
+                text: 'Source: <a href="https://webonise.com">webonise.com</a>'
+            },
+            xAxis: {
+                categories: []
+            },
+            plotOptions: {
+                series: {
+                    cursor: 'pointer',
+                    point: {
+                        events: {
+                            click: function() {
+                                var category = this.name.toLowerCase();
+                                fetch(apiConfig[category], function(response) {
+                                	module.setNauseaValue(response)
+                                	chartTwo(module.getNauseaValue());
+                                });
+                            }
+                        }
+                    }
+                }
+            },
+            credits: {
+                enabled: false
+            },
+            series: [{
+                name: 'Subjects',
+                data: processedJsonChart1
+            }]
+        });
+    };
+
+    function chartTwo(data) {
+        // Chart 2 //
+        var processedJsonChart2 = new Array();
+        for (i = 0; i < data.result.length; i++) {
+            processedJsonChart2.push([data.result[i].name, data.result[i].count]);
+        }
+        $('#chart2').highcharts({
+            chart: {
+                type: 'bar'
+            },
+            title: {
+                text: 'My 2nd Chart'
+            },
+            subtitle: {
+                text: 'Source: <a href="https://webonise.com">webonise.com</a>'
+            },
+            xAxis: {
+                categories: []
+            },
+            plotOptions: {
+                series: {
+                    cursor: 'pointer',
+                    point: {
+                        events: {
+                            click: function() {
+                                var category = this.name.toLowerCase();
+                                fetch(apiConfig[category], function(response) {
+                                    module.setHumiraValue(response)
+                                    chartThree(module.getHumiraValue());
+                                });
+                            }
+                        }
+                    }
+                }
+            },
+            credits: {
+                enabled: false
+            },
+            series: [{
+                name: 'Subjects',
+                data: processedJsonChart2
+            }]
+        });
+    }
+
+    function chartThree(data) {
+        // Chart 1 //
+        var processedJsonChart3 = new Array();
+        for (i = 0; i < data.result.length; i++) {
+            processedJsonChart3.push([data.result[i].name, data.result[i].y]);
+        }
+        $('#chart3').highcharts({
+            chart: {
+                plotBackgroundColor: null,
+                plotBorderWidth: null,
+                plotShadow: false,
+                type: 'pie'
+            },
+            title: {
+                text: 'My 3rd Chart'
+            },
+            subtitle: {
+                text: 'Source: <a href="https://webonise.com">webonise.com</a>'
+            },
+            plotOptions: {
+                pie: {
+                    allowPointSelect: true,
+                    cursor: 'pointer',
+                    dataLabels: {
+                        enabled: false
+                    },
+                    showInLegend: true
+                }
+            },
+            series: [{
+                name: 'Subjects',
+                data: processedJsonChart3
+            }]
+        });
+    }
+})(this);
+</script>
+</body>
+</html>

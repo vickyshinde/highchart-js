@@ -1,0 +1,224 @@
+<html>
+<head>
+	<meta charset="UTF-8">
+	<title>Document</title>
+	<!-- Latest compiled and minified CSS -->
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
+
+	<!-- Optional theme -->
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap-theme.min.css">
+	<style>
+		body {
+			background: #ccc;
+			padding-top: 20px;
+		}
+	</style>
+	<script src="http://code.jquery.com/jquery-1.11.3.min.js"></script>
+	<script src="http://code.jquery.com/jquery-migrate-1.2.1.min.js"></script>
+	<script src="http://code.highcharts.com/highcharts.js"></script>
+	<script src="http://code.highcharts.com/modules/exporting.js"></script>
+	<script type="text/javascript">
+
+	$(function () {
+		var jsonURLChart1 = 'http://localhost:8080/highchart/www/api/adverseEffect.json';
+		var jsonURLChart2 = 'http://localhost:8080/highchart/www/api/nauseaCausingDrug.json';
+		var jsonURLChart3 = 'http://localhost:8080/highchart/www/api/humiraGenderDistribution.json';
+		
+		// Chart 1 //
+		var processedJsonChart1 = new Array();   
+		$.getJSON(jsonURLChart1, function(data) {
+		   for (i = 0; i < data.result.length; i++){
+		       processedJsonChart1.push([data.result[i].name, data.result[i].count]);
+		   }
+			$('#chart1').highcharts({
+			    chart: {
+			        type: 'bar'
+			    },
+			    title: {
+			        text: 'My 1st Chart'
+			    },
+			    subtitle: {
+			        text: 'Source: <a href="https://webonise.com">webonise.com</a>'
+			    },
+			    xAxis: {
+			        categories: []
+			    },
+			    yAxis: {
+			        min: 0,
+			        title: {
+			            text: 'Population (millions)',
+			            align: 'high'
+			        },
+			        labels: {
+			            overflow: 'justify'
+			        }
+			    },
+			    tooltip: {
+			        valueSuffix: ' millions'
+			    },
+			    plotOptions: {
+			        bar: {
+			            dataLabels: {
+			                enabled: true
+			            }
+			        },
+                    series: {
+                        cursor: 'pointer',
+                        point: {
+                            events: {
+                                click: function () {
+                                   funChartTwo();
+                                }
+                            }
+                        }
+                    }
+                },
+			    legend: {
+			        layout: 'vertical',
+			        align: 'right',
+			        verticalAlign: 'top',
+			        x: -40,
+			        y: 80,
+			        floating: true,
+			        borderWidth: 1,
+			        backgroundColor: ((Highcharts.theme && Highcharts.theme.legendBackgroundColor) || '#FFFFFF'),
+			        shadow: true
+			    },
+			    credits: {
+			        enabled: false
+			    },
+			    series: [{
+			        name: 'Subjects',
+			        data: processedJsonChart1
+			    }]
+			});
+		});
+		
+		
+	var funChartTwo = function(){
+		// Chart 2 //
+		var processedJsonChart2 = new Array();   
+        $.getJSON(jsonURLChart2, function(data) {
+           // Populate series
+           for (i = 0; i < data.result.length; i++){
+               processedJsonChart2.push([data.result[i].name, data.result[i].count]);
+           }
+	    	$('#chart2').highcharts({
+		        chart: {
+		            type: 'bar'
+		        },
+		        title: {
+		            text: 'My 2nd Chart'
+		        },
+		        subtitle: {
+		            text: 'Source: <a href="https://webonise.com">webonise.com</a>'
+		        },
+		        xAxis: {
+		            categories: []
+		        },
+		        yAxis: {
+	            min: 0,
+		            title: {
+		                text: 'Population (millions)',
+		                align: 'high'
+		            },
+		            labels: {
+		                overflow: 'justify'
+		            }
+		        },
+		        tooltip: {
+		            valueSuffix: ' millions'
+		        },
+		        plotOptions: {
+			        bar: {
+			            dataLabels: {
+			                enabled: true
+			            }
+			        },
+                    series: {
+                        cursor: 'pointer',
+                        point: {
+                            events: {
+                                click: function () {
+                                   funChartThree();
+                                }
+                            }
+                        }
+                    }
+                },
+		        legend: {
+		            layout: 'vertical',
+		            align: 'right',
+		            verticalAlign: 'top',
+		            x: -40,
+		            y: 80,
+		            floating: true,
+		            borderWidth: 1,
+		            backgroundColor: ((Highcharts.theme && Highcharts.theme.legendBackgroundColor) || '#FFFFFF'),
+		            shadow: true
+		        },
+		        credits: {
+		            enabled: false
+		        },
+		        series: [{
+	                name: 'Subjects',
+	                data: processedJsonChart2
+	            }]
+		    });
+		});
+	};
+
+	var funChartThree = function(){	
+		// Chart 3 //
+		var processedJsonChart3 = new Array();   
+	        $.getJSON(jsonURLChart3, function(data) {                   
+	           for (i = 0; i < data.result.length; i++){
+	               processedJsonChart3.push([data.result[i].name, data.result[i].y]);
+	           }
+			$('#chart3').highcharts({
+			    chart: {
+			        plotBackgroundColor: null,
+			        plotBorderWidth: null,
+			        plotShadow: false,
+			        type: 'pie'
+			    },
+		        title: {
+		            text: 'My 3rd Chart'
+		        },
+		        subtitle: {
+		            text: 'Source: <a href="https://webonise.com">webonise.com</a>'
+		        },
+			    plotOptions: {
+			        pie: {
+			            allowPointSelect: true,
+			            cursor: 'pointer',
+			            dataLabels: {
+			                enabled: false
+			            },
+			            showInLegend: true
+			        }
+			    },
+			    series: [{
+			        name: 'Subjects',
+			        data: processedJsonChart3
+			    }]
+			});
+		});	
+	};	
+	});	
+	</script>
+	
+</head>
+<body>
+
+<div class="container-fluid">
+  <div class="row">
+    <div class="col-md-4"><div id="chart1" style="min-width: 310px; max-width: 800px; height: 600px; margin: 0 auto"></div></div>
+    <div class="col-md-4"><div id="chart2" style="min-width: 310px; max-width: 800px; height: 600px; margin: 0 auto"></div></div>
+    <div class="col-md-4"><div id="chart3" style="min-width: 310px; max-width: 800px; height: 600px; margin: 0 auto"></div></div>
+  </div>
+</div>
+
+<!-- <div id="results">	</div> -->
+</body>
+</html>
